@@ -1,0 +1,22 @@
+# Workshop Software Requirements
+
+- Docker Desktop ([Download](https://www.docker.com/products/docker-desktop)) installed and running. Podman and Rancher Desktop also work.
+- .NET 9 SDK (Minimum) ([Download](https://dotnet.microsoft.com/download/dotnet/9.0)) installed. Note: While .NET 9 is supported, it reaches end of support in November 2026. This workshop recommends using .NET 10 for current and future labs.
+- .NET 10 SDK ([Download](https://dotnet.microsoft.com/download/dotnet/10.0)) installed, if you want to use the .NET 10 AppHost template.
+- Node.js 20+ and npm (Minimum) ([Download](https://nodejs.org/)) installed.
+- A code editor of your choice installed:
+  - [Visual Studio 2026](https://visualstudio.microsoft.com/vs/)
+  - [Visual Studio Code](https://code.visualstudio.com/) with [C# Dev Kit](https://code.visualstudio.com/docs/csharp/get-started)
+  - [JetBrains Rider](https://www.jetbrains.com/rider/)
+- Aspire extension for your selected editor:
+  - VS Code: [Download](https://aspire.dev/get-started/aspire-vscode-extension/)
+  - Visual Studio: Built into the latest version
+  - Rider: [Download](https://plugins.jetbrains.com/plugin/23289-aspire)
+- If using Visual Studio, install workloads:
+  - .NET desktop development
+  - ASP.NET and web development
+- An Azure subscription for the deployment section (a free trial works).
+- Azure CLI ([Download](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) installed and configured.
+- Git ([Download](https://git-scm.com/downloads)) installed.
+- The ability to install applications on your machine.
+- An internet connection to download dependencies and tools.

@@ -1,0 +1,24 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>e1afe483-2937-4407-8015-edcc8eaa3709</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CloudStore.ApiService\CloudStore.ApiService.csproj" />
+    <ProjectReference Include="..\CloudStore.Web\CloudStore.Web.csproj" />
+    <ProjectReference Include="..\CloudStore.ProductsApi\CloudStore.ProductsApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure.AppContainers" Version="13.4.6" />
+    <PackageReference Include="Aspire.Hosting.Azure.Redis" Version="13.4.6" />
+    <PackageReference Include="Aspire.Hosting.Azure.Sql" Version="13.4.6" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.SqlServer.Extensions" Version="13.4.0" />
+  </ItemGroup>
+
+</Project>

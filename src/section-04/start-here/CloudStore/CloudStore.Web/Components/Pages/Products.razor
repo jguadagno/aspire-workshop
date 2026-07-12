@@ -1,0 +1,47 @@
+@page "/products"
+@attribute [StreamRendering(true)]
+@inject ProductsApiClient ProductsApi
+
+<PageTitle>Products</PageTitle>
+
+<h1>CloudStore Products</h1>
+
+@if (_products is null)
+{
+    <p>
+        <em>Loading products...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var product in _products)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+                <td>@product.Price.ToString("C")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Product[]? _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await ProductsApi.GetProductsAsync();
+    }
+}

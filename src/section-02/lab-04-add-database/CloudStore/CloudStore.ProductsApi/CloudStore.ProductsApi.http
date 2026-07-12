@@ -1,0 +1,6 @@
+@CloudStore.ProductsApi_HostAddress = http://localhost:5114
+
+GET {{CloudStore.ProductsApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

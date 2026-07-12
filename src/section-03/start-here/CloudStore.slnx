@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Extra/">
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="CloudStore.Api.Tests/CloudStore.Api.Tests.csproj" />
+  <Project Path="CloudStore.Api/CloudStore.Api.csproj" />
+  <Project Path="CloudStore.Infrastructure/CloudStore.Infrastructure.csproj" />
+</Solution>
