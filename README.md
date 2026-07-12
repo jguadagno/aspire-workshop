@@ -1,6 +1,6 @@
 # Aspire Workshop
 
-This repository contains hands-on labs and source code for an Aspire workshop centered on CloudStore scenarios.
+This repository contains hands-on labs and source code for an Aspire workshop, [Aspire in Practice: Faster Onboarding, Better Observability, Smarter Distributed Development](https://www.josephguadagno.net/presentations/aspire-in-practice-faster-onboarding-better-observability-smarter-distributed-development), centered on CloudStore scenarios.
 
 ## Requirements
 
@@ -65,3 +65,4 @@ aspire-workshop/
 - [Aspire Integrations Overview](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/integrations-overview)
 - [Aspire GitHub Repository](https://github.com/microsoft/aspire)
 - [Aspire Samples](https://github.com/dotnet/aspire-samples)
+- Talk: [Aspire in Practice: Faster Onboarding, Better Observability, Smarter Distributed Development](https://www.josephguadagno.net/presentations/aspire-in-practice-faster-onboarding-better-observability-smarter-distributed-development)
