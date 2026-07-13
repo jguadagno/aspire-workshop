@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using Azure.Data.Tables;
-using SixLabors.ImageSharp;
 
 namespace CloudStore.Infrastructure.Services
 {
@@ -10,7 +9,7 @@ namespace CloudStore.Infrastructure.Services
         Task DeleteProductImageAsync(string blobName);
     }
 
-    public class StorageService(BlobServiceClient blobServiceClient, TableServiceClient tableServiceClient) : IStorageService
+    public class StorageService(BlobContainerClient blobContainer, TableClient queueTable, IImageService imageService) : IStorageService
     {
         private const string ContainerName = "product-images";
         private const string TableName = "ProductImageQueue";
@@ -20,8 +19,10 @@ namespace CloudStore.Infrastructure.Services
             // Validate image
             try
             {
+                if (!imageService.IsValidImage(imageStream))
+                    throw new InvalidOperationException("Invalid image file");
+
                 imageStream.Position = 0;
-                using var image = Image.Load(imageStream);
             }
             catch
             {
@@ -31,7 +32,6 @@ namespace CloudStore.Infrastructure.Services
             // Upload blob
             imageStream.Position = 0;
             var blobName = $"products/{productId}/{Guid.NewGuid()}_{fileName}";
-            var blobContainer = blobServiceClient.GetBlobContainerClient(ContainerName);
             await blobContainer.CreateIfNotExistsAsync();
             var blob = blobContainer.GetBlobClient(blobName);
             await blob.UploadAsync(imageStream, overwrite: true);
@@ -47,7 +47,6 @@ namespace CloudStore.Infrastructure.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var queueTable = tableServiceClient.GetTableClient(TableName);
             await queueTable.CreateIfNotExistsAsync();
             await queueTable.AddEntityAsync(queueEntity);
 
@@ -56,7 +55,6 @@ namespace CloudStore.Infrastructure.Services
 
         public async Task DeleteProductImageAsync(string blobName)
         {
-            var blobContainer = blobServiceClient.GetBlobContainerClient(ContainerName);
             var blob = blobContainer.GetBlobClient(blobName);
             await blob.DeleteAsync();
         }

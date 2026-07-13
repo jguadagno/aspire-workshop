@@ -12,9 +12,5 @@
     <PackageReference Include="StackExchange.Redis" Version="3.0.7" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.29.1" />
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="4.0.0" />
   </ItemGroup>
-  <PropertyGroup>
-    <SixLaborsLicenseFile>../sixlabors.lic</SixLaborsLicenseFile>
-  </PropertyGroup>
 </Project>

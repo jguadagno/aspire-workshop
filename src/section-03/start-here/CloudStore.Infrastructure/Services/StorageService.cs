@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using Azure.Data.Tables;
-using SixLabors.ImageSharp;
 
 namespace CloudStore.Infrastructure.Services
 {
@@ -10,7 +9,7 @@ namespace CloudStore.Infrastructure.Services
         Task DeleteProductImageAsync(string blobName);
     }
 
-    public class StorageService(BlobContainerClient blobContainer, TableClient queueTable) : IStorageService
+    public class StorageService(BlobContainerClient blobContainer, TableClient queueTable, IImageService imageService) : IStorageService
     {
         private const string ContainerName = "product-images";
         private const string TableName = "ProductImageQueue";
@@ -20,8 +19,10 @@ namespace CloudStore.Infrastructure.Services
             // Validate image
             try
             {
+                if (!imageService.IsValidImage(imageStream))
+                    throw new InvalidOperationException("Invalid image file");
+
                 imageStream.Position = 0;
-                using var image = Image.Load(imageStream);
             }
             catch
             {

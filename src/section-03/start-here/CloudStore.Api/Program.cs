@@ -69,6 +69,7 @@ builder.Services.AddSingleton(tableClient);
 // Services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 var app = builder.Build();
 
