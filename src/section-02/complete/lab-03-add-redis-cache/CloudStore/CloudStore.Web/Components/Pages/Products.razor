@@ -1,5 +1,5 @@
 @page "/products"
-@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 30), StreamRendering(true)]
 @inject ProductsApiClient ProductsApi
 
 <PageTitle>Products</PageTitle>

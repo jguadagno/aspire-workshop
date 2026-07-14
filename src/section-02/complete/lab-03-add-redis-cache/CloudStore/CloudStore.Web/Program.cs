@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Wire up Redis as the output cache backing store.
+// "cache" must match the name used in AddRedis("cache") in the AppHost
+builder.AddRedisOutputCache("cache");
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

@@ -112,9 +112,9 @@ app.UseOutputCache();
 
 ---
 
-## Step 5 – Cache the Products Response
+## Step 5 – Cache the Products Api Response
 
-If you add a minimal API route in the Web project, you can use the `[OutputCache]` attribute directly.
+If you add a minimal API route in the Api project, you can use the `[OutputCache]` attribute directly.
 
 Continuing in the `CloudStore.ProductsApi/Program.cs` file, update the `/products` endpoint to use the `[OutputCache]` attribute:
 
@@ -140,7 +140,29 @@ This will cache the response for 60 seconds. You can adjust the duration as need
 
 ---
 
-## Step 6 – Run and Verify
+## Step 6 – Cache the Products Page in the Web Frontend
+
+From the command line, add the `Aspire.StackExchange.Redis.OutputCaching` package to the Web project:
+
+```bash
+dotnet add CloudStore.Web package Aspire.StackExchange.Redis.OutputCaching
+```
+
+Now, just like the ProductsApi, we need to register the Redis output cache in the Web project. Open `CloudStore.Web/Program.cs` and add `AddRedisOutputCache("cache")` after the `builder.AddServiceDefaults();` line:
+
+```csharp
+// Wire up Redis as the output cache backing store.
+// "cache" must match the name used in AddRedis("cache") in the AppHost
+builder.AddRedisOutputCache("cache");
+```
+
+Now, we need to configure the output cache in the Web project. Open `CloudStore.Web/Pages/Products.razor` and change the `@attribute` line to add the `[OutputCache]` attribute to the `@page` directive:
+
+```razor
+@attribute [OutputCache(Duration = 30), StreamRendering(true)]
+```
+
+## Step 7 – Run and Verify
 
 ```bash
 aspire run
