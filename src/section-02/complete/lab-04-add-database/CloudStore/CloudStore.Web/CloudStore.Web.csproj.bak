@@ -10,8 +10,4 @@
     <ProjectReference Include="..\CloudStore.ServiceDefaults\CloudStore.ServiceDefaults.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.4.6" />
-  </ItemGroup>
-
 </Project>
