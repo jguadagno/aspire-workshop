@@ -29,7 +29,7 @@ Aspire's Microsoft SQL Server hosting integration spins up a Microsoft SQL Serve
 
 ## Step 1 – Add the Microsoft SQL Server Hosting Integration to AppHost
 
-Starting from the folder `lab-04-add-database\CloudStore`
+Starting from the folder `CloudStore` folder, run the following command to add the Microsoft SQL Server hosting integration package to the AppHost project:
 
 ```bash
 dotnet add CloudStore.AppHost package Aspire.Hosting.SqlServer
@@ -119,6 +119,8 @@ dotnet add CloudStore.ProductsApi package Aspire.Microsoft.EntityFrameworkCore.S
 
 ## Step 4 – Create the Product Model and DbContext
 
+> ***Note***: Both of these files can be copied from `src/section-02/lab-04-files/Data` if you want to skip typing them out.
+
 Create `CloudStore.ProductsApi/Data/Product.cs`:
 
 ```csharp
@@ -167,7 +169,9 @@ Open `CloudStore.ProductsApi/Program.cs` and update it:
 
 ```csharp
 using CloudStore.ProductsApi.Data;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -228,6 +232,7 @@ Aspire manages the database container (including the connection string), and als
 Create a folder at the root of the solution called `scripts\database`. Inside that folder, create a new file called `create-database.sql` with the following content:
 
 > Note: Make sure to replace `<REPLACE_ME>` with a password that meets SQL Server's password requirements (at least 8 characters, including uppercase, lowercase, number, and symbol) before running the app or the database creation will fail since we set the password in the SQL script and it's required for the SQL Server container to start properly.
+> Note: These files can be copied from `src/section-02/lab-04-files/scripts` if you want to skip typing them out.
 
 ```sql
 CREATE DATABASE CloudStore
@@ -372,40 +377,6 @@ Watch the dashboard. You should now see:
 | ------------------------------ | -------------------------------------------------------------- |
 | Products page shows empty list | Check `productsapi` logs — seeding may have failed silently    |
 | `dbgate` not in dashboard      | Ensure `.WithDbGate()` is chained on `AddSqlServer` in AppHost |
-
----
-
-## ✨ Bonus Challenge
-
-Add a `POST /products` endpoint just before `app.Run()` in `ProductsApi/Program.cs` to allow users to create new products:
-
-```csharp
-app.MapPost("/products", async (Product request, AppDbContext db) =>
-{
-    var product = new Product
-    {
-        Name          = request.Name,
-        Price         = request.Price,
-        Category      = request.Category,
-        StockQuantity = request.StockQuantity
-    };
-
-    db.Products.Add(product);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/products/{product.Id}", product);
-});
-```
-
-Run the app again and use curl to create a new product.
-
-Single line:
-
-```bash
-curl -X POST http://localhost:<productsapi-port>/products -H "Content-Type: application/json" -d '{"name":"Aspire Cap","price":24.99,"category":"Apparel","stockQuantity":75}'
-```
-
-Replace `<productsapi-port>` with the port shown in the dashboard Resources view. Then check DbGate to confirm the new row was inserted.
 
 ---
 
