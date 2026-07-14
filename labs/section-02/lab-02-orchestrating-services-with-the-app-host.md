@@ -328,51 +328,6 @@ In the dashboard you should now see **three** resources:
 
 ---
 
-## ✨ Bonus Challenge
-
-If you finish early, try this optional extension: add a custom health check to ProductsApi and configure AppHost to wait on it before starting the web frontend.
-
-<https://www.c-sharpcorner.com/article/advanced-asp-net-core-health-checks/>
-
-Add a health check that validates the products list is non-empty:
-
-Add a reference to the health checks package:
-
-```bash
-dotnet add CloudStore.ProductsApi package Microsoft.Extensions.Diagnostics.HealthChecks
-```
-
-Open `CloudStore/CloudStore.ProductsApi/Program.cs` and add the following health check before `builder.Build()`:
-
-```csharp
-builder.Services.AddHealthChecks()
-    .AddCheck("products-available", () =>
-    {
-        // In a real app this would query a DB; for now just return healthy
-        return HealthCheckResult.Healthy("Products available");
-    }, ["live"]);
-```
-
-Then add the using statement at the top of the file:
-
-```csharp
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-```
-
-Open the `CloudStore/CloudStore.AppHost/AppHost.cs` file and add `.WithHttpHealthCheck("/health");` to the *productsApi* registration to make it wait for this new health check before starting:
-
-```csharp
-// Register the new ProductsApi
-var productsApi = builder.AddProject<Projects.CloudStore_ProductsApi>("productsapi")
-    .WithHttpHealthCheck("/health");
-```
-
-Restart the app and verify the new health check appears in the dashboard Resources view under the `productsapi` health details.
-
-- Click on `productsapi`, then scroll to the *Health checks* section and confirm you see `products-available` with a healthy status.
-
----
-
 ## Summary
 
 | Concept                          | Location                                  |
