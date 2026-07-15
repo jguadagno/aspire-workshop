@@ -34,7 +34,7 @@ In this lab, we'll create an AppHost that registers our existing API and Web pro
 
 ## Getting Started
 
-You can begin the lab with the starter application in the `labs/section-03/start-here` folder. This application is fully functional and can be run locally with docker-compose. The goal of this lab is to replace the docker-compose setup with an Aspire AppHost.  If you want, make a copy of the starter application in a new folder (e.g., `labs/section-03/lab-01`) so you can experiment without affecting the original.
+You can begin the lab with the starter application in the `src/section-03/start-here` folder. This application is fully functional and can be run locally with docker-compose. The goal of this lab is to replace the docker-compose setup with an Aspire AppHost.  If you want, make a copy of the starter application in a new folder (e.g., `src/section-03/lab-01`) so you can experiment without affecting the original.
 
 > Note: Make sure you stop any running docker-compose services before starting the lab. You can do this by running `docker compose down` in the starter application folder.
 > Note: If you copy the starter application to a new folder after you have already got the project working, it may take a few minutes to copy because of the `node_modules` folder. You can skip copying the `node_modules` folder and run `npm install` in the new folder to restore the dependencies.
@@ -230,7 +230,7 @@ After startup, open the Aspire dashboard URL printed in the terminal. It will lo
 
    Dashboard:  https://localhost:17298/login?t=d637c204d129963ad661156a4f606a69
 
-        Logs:  C:\Users\jguad\.aspire\logs\cli_20260630T162934383_detach-child_8fd6b9664afa4cad9f98ccdeedc85725.log
+        Logs:  <user_home>\.aspire\logs\cli_20260630T162934383_detach-child_8fd6b9664afa4cad9f98ccdeedc85725.log
 
          PID:  36640
 
@@ -260,6 +260,12 @@ Click the dashboard link and verify that the resources are running and healthy:
 - If package restore fails during startup, run `dotnet restore .\CloudStore.slnx` and retry.
 
 ## Step 3 – Wire `CloudStore.Api` and `CloudStore.Web` into AppHost and map configuration
+
+Stop the AppHost if it is running, then add the API and Web projects as resources.
+
+```bash
+aspire stop
+```
 
 ### 3.1 Add API and Web projects to AppHost
 
@@ -382,7 +388,7 @@ Now, the API will pick up the connection strings for Blob and Table storage from
 Open up the `CloudStore.Infrastructure\Services\StorageService.cs` file and update the constructor to accept `BlobServiceClient` and `TableServiceClient` as parameters. Then, use these clients to perform Blob and Table operations.
 
 ```csharp
-public class StorageService(BlobServiceClient blobServiceClient, TableServiceClient tableServiceClient) : IStorageService
+public class StorageService(BlobServiceClient blobServiceClient, TableServiceClient tableServiceClient, IImageService imageService) : IStorageService
 ```
 
 Next get a instance of the Blob container `product-images` for the `UploadProductImageAsync` method.
@@ -468,7 +474,7 @@ Open up the `CloudStore.Api\Program.cs` file and update the CORS policy to allow
 
 ```csharp
         var frontEndUri = Environment.GetEnvironmentVariable("Angular_FrontEnd") ?? "http://localhost:4200";
-        policy.WithOrigins(frontEndUri)
+        policy.WithOrigins(frontEndUri);
 ```
 
 This will allow the Web frontend to access the API when running under Aspire, and it will also allow the Web frontend to access the API when running locally with `docker-compose` or in production.
@@ -500,10 +506,13 @@ Open the frontend endpoint from the Aspire dashboard and verify:
 - If Web cannot reach API, inspect Web environment variables and API endpoint in dashboard.
 - If API starts but CRUD fails, check API logs for database connection errors.
 - If image upload fails, check Azure Storage resource logs and API exceptions.
+- If you uploaded an image but it does not appear in the product list, this is most likely due to the permissions of the blob container. Make sure the container is set to allow public access to blobs. You can do this in the Azure Storage Explorer. Note: you will not want to make your container public in production, you will want to put it behind a CDN, but for this lab, it is fine to do so.
 
 ### 3.5 Service Defaults
 
 Now that everything is working, you can add the "service defaults" functionality to the application. This will allow you to add telemetry, health checks, and service discovery to the application without having to modify the code in the API or Web projects.
+
+Stop the AppHost if it is running..
 
 In a Terminal, run the following command from the repo root:
 
@@ -569,11 +578,21 @@ Select the skills that you want to enable for this agent. Make sure you scroll d
 
 > Note: If you are curious what each skill does, check out the Aspire documentation [Agent Skills](https://aspire.dev/get-started/aspire-skills/).
 
+Once done, the agent will be registered and the skills will be installed. You should see a message similar to the following:
+
+```text
+🤖 Installed Aspire agent skills:                                                           
+     Skills: aspire, aspire-deployment, aspire-init, aspire-monitoring, aspire-orchestration
+     Locations: .agents/skills                                                              
+✅ Configure VS Code to use the Aspire MCP server
+✅ Agent environment configuration complete.
+```
+
 If you open Explorer, or Finder, you should see a new folder called `.agents` in your home directory. This is where the Aspire skills are installed.
 
 ### 4.2 Use the Aspire MCP agent
 
-With AppHost running, use MCP commands from your agent/client:
+With AppHost running, wait for all of the resources to be healthy, then use the MCP commands from your agent/client:
 
 ```text
 list_apphosts
@@ -593,6 +612,31 @@ Use MCP to inspect runtime state:
 
 ```text
 list_resources
+```
+
+This should show all of the resources that are running in the AppHost, including the API, Web, PostgreSQL, Redis, and Azure Storage resources. The output should look similar to the following:
+
+| Name | Type | State |
+| ---- | ---- | ----- | 
+| api-rebuilder | Executable | NotStarted |
+| api | Project | Running |
+| aspire-dashboard | Executable | Running |
+| azureacd9b | AzureEnvironmentResource | — |
+| blobs | AzureBlobStorageResource | Running |
+| pgadmin | Container | Running |
+| postgres | Container | Running |
+| PostgreSQL (db) | PostgresDatabaseResource | Running |
+| redis | Container | Running |
+| storage | AzureStorageResource | Running |
+| tables | AzureTableStorageResource | Running |
+| web-installer | Executable | Finished |
+| web | Executable | Running |
+
+Everything is running except `api-rebuilder` (NotStarted, expected — it's a manual trigger) and `web-installer` (Finished, a one-shot setup task). Let me know if you want logs or details on any specific resource.
+
+Some other commands to run.
+
+```text
 list_console_logs(resourceName: "api")
 list_structured_logs(resourceName: "api")
 list_traces
