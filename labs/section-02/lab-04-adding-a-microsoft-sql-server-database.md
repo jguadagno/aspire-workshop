@@ -67,6 +67,7 @@ var apiService = builder.AddProject<Projects.CloudStore_ApiService>("apiservice"
 var productsApi = builder.AddProject<Projects.CloudStore_ProductsApi>("productsapi")
     .WithReference(cache)
     .WithReference(cloudStoreDb)    // <-- Inject the SQL Server connection string into the products API
+    .WithHttpHealthCheck("/health")
     .WaitFor(cloudStoreDb)          // <-- wait for the database to be ready before starting the products API
     .WaitFor(cache);
 
