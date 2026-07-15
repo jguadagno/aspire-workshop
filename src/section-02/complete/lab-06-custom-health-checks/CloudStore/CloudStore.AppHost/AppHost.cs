@@ -2,14 +2,16 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // Add a Redis container (Aspire pulls the image automatically)
 var cache = builder.AddRedis("cache")
-    .WithRedisInsight();
+    .WithRedisInsight(); // <-- Optional, adds RedisInsight for monitoring the Redis instance
 
 var sql = builder.AddSqlServer("cloudstore-sqlserver")
     .PublishAsConnectionString() // <-- publish the connection string to the dashboard and inject into consuming projects
     .WithImageTag("2022-latest") // <-- optional, defaults to latest 2022 image, if you are using a Mac, this is required since the default image is not compatible with Apple Silicon
-    .WithLifetime(ContainerLifetime.Persistent) // <-- optional, defaults to transient, but we want to persist the database across restarts
-    .WithDataVolume("cloudstore-data") // <-- optional, this allows you to persist the database data across restarts, otherwise it will be lost when the container is removed
-    .WithDbGate();
+    .WithLifetime(ContainerLifetime
+        .Persistent) // <-- optional, defaults to transient, but we want to persist the database across restarts
+    .WithDataVolume(
+        "cloudstore-data") // <-- optional, this allows you to persist the database data across restarts, otherwise it will be lost when the container is removed
+    .WithDbGate();     // <-- optional, this allows you to persist the database data across restarts, otherwise it will be lost when the container is removed
 
 var path = builder.AppHostDirectory;
 var sqlText = string.Concat(
@@ -30,7 +32,7 @@ var apiService = builder.AddProject<Projects.CloudStore_ApiService>("apiservice"
 var productsApi = builder.AddProject<Projects.CloudStore_ProductsApi>("productsapi")
     .WithFriendlyUrls("Products API")
     .WithReference(cache)
-    .WithReference(cloudStoreDb)    // <-- Inject the SQL Server connection string into the products API
+    .WithReference(cloudStoreDb)    // <-- Inject the SQL Server connection string into the products 
     .WithHttpHealthCheck("/health")
     .WaitFor(cloudStoreDb)          // <-- wait for the database to be ready before starting the products API
     .WaitFor(cache);
@@ -54,10 +56,5 @@ var healthChecksUI = builder.AddHealthChecksUI("healthchecksui")
     // In a production environment, you should consider adding authentication to the ingress layer
     // to restrict access to the dashboard.
     .WithExternalHttpEndpoints();
-
-if (builder.ExecutionContext.IsRunMode)
-{
-    healthChecksUI.WithHostPort(7230);
-}
 
 builder.Build().Run();

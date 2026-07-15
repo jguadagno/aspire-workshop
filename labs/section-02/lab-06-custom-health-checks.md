@@ -30,10 +30,10 @@ In this lab, you extend that model in two layers:
 
 The Aspire Dashboard and HealthChecks UI complement each other:
 
-| Surface | Best for |
-| --- | --- |
+| Surface              | Best for                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
 | **Aspire Dashboard** | Resource state, topology, and OpenTelemetry signals (traces, logs, metrics) across the whole app |
-| **HealthChecks UI** | Detailed pass/fail results from ASP.NET Core health checks, including dependency-specific checks |
+| **HealthChecks UI**  | Detailed pass/fail results from ASP.NET Core health checks, including dependency-specific checks |
 
 OpenTelemetry still provides the broader observability story (request flow, logs, and performance metrics), while health checks provide fast readiness/liveness and dependency status signals. In production, the same telemetry patterns can be exported to platforms like Azure Monitor, Jaeger, or Grafana.
 
@@ -44,6 +44,8 @@ OpenTelemetry still provides the broader observability story (request flow, logs
 A custom health check is just a class that implements `IHealthCheck` and is registered in the DI container. In Lab 2, you added a simple HTTP health check to each service with `.WithHttpHealthCheck("/health")`. Now add a custom health check to the `productsapi` service that verifies the product catalog is not empty.
 
 In the `CloudStore.ProductsApi` project, create a new file named `ProductCatalogHealthCheck.cs` with the following content:
+
+> Note: This code can be copied from `src/section-02/lab-06-files/ProductCatalogHealthCheck.cs` if you prefer.
 
 ```csharp
 using CloudStore.ProductsApi.Data;
@@ -99,7 +101,7 @@ This is because Aspire, currently, does not "see" the health check results that 
 
 Stop the projects and open the `CloudStore.AppHost` project. We will add the HealthChecksUI to the AppHost so that it can display the health status of all services in a single dashboard.
 
-Add the following files from `lab-06-files` to the `CloudStore.AppHost` project:
+Add the following files from `src/section-02/lab-06-files` to the `CloudStore.AppHost` project:
 
 - `HealthChecksUIExtensions.cs` - This file defines how the resource is created.
 - `HealthChecksUIResource.cs` - This file contains properties for the HealthChecksUI resource.
@@ -135,6 +137,8 @@ In this step, you update shared defaults so all services get consistent behavior
 - Add **output caching** to reduce repeated probe load.
 - Keep the existing readiness/liveness endpoints (`/health` and `/alive`).
 - Add a **host-restricted UI endpoint** path (from `HEALTHCHECKSUI_URLS`) so only configured hosts can query detailed health data.
+
+Stop the application.
 
 Add the package `AspNetCore.HealthChecks.UI.Client` to the `CloudStore.ServiceDefaults.csproj` file:
 
@@ -253,14 +257,14 @@ You'll also notice that for the `productsapi` service, the health check we added
 
 Use this table to quickly diagnose the most common issues in this lab.
 
-| Symptom | Likely cause | Fix |
-| --- | --- | --- |
-| `productsapi` shows *Unhealthy* in HealthChecks UI with `product_catalog_health_check` failing | Product table is empty | Seed at least one product record, then refresh HealthChecks UI. |
-| Aspire Dashboard shows a generic health error (for example, endpoint not returning 2xx) | Health endpoint is failing or timing out | Open the service logs in Aspire Dashboard, verify `/health` responds, and confirm dependencies (SQL/Redis) are running. |
-| HealthChecks UI resource appears, but service entries remain unavailable | Services are not exposing UI-formatted health responses | Confirm `AspNetCore.HealthChecks.UI.Client` is installed and `UIResponseWriter.WriteHealthCheckUIResponse` is configured in `MapDefaultEndpoints`. |
-| HealthChecks UI cannot read the detailed endpoint | Host filtering blocks the request | Verify `HEALTHCHECKSUI_URLS` is set by AppHost and that `RequireHost(...)` includes the actual host/port being used. |
-| Build fails after adding `ProductCatalogHealthCheck` | Missing namespace import in `Program.cs` | Add the correct `using` statement for the namespace containing `ProductCatalogHealthCheck`. |
-| Custom health check never changes state while debugging | Check not being hit or stale cached result | Set a breakpoint in `CheckHealthAsync`, then refresh UI after cache expiration (default 10 seconds) or temporarily lower cache duration. |
+| Symptom                                                                                        | Likely cause                                            | Fix                                                                                                                                                |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `productsapi` shows *Unhealthy* in HealthChecks UI with `product_catalog_health_check` failing | Product table is empty                                  | Seed at least one product record, then refresh HealthChecks UI.                                                                                    |
+| Aspire Dashboard shows a generic health error (for example, endpoint not returning 2xx)        | Health endpoint is failing or timing out                | Open the service logs in Aspire Dashboard, verify `/health` responds, and confirm dependencies (SQL/Redis) are running.                            |
+| HealthChecks UI resource appears, but service entries remain unavailable                       | Services are not exposing UI-formatted health responses | Confirm `AspNetCore.HealthChecks.UI.Client` is installed and `UIResponseWriter.WriteHealthCheckUIResponse` is configured in `MapDefaultEndpoints`. |
+| HealthChecks UI cannot read the detailed endpoint                                              | Host filtering blocks the request                       | Verify `HEALTHCHECKSUI_URLS` is set by AppHost and that `RequireHost(...)` includes the actual host/port being used.                               |
+| Build fails after adding `ProductCatalogHealthCheck`                                           | Missing namespace import in `Program.cs`                | Add the correct `using` statement for the namespace containing `ProductCatalogHealthCheck`.                                                        |
+| Custom health check never changes state while debugging                                        | Check not being hit or stale cached result              | Set a breakpoint in `CheckHealthAsync`, then refresh UI after cache expiration (default 10 seconds) or temporarily lower cache duration.           |
 
 ---
 
@@ -268,13 +272,13 @@ Use this table to quickly diagnose the most common issues in this lab.
 
 In this lab, you added application-level and UI-level health visibility across your Aspire solution:
 
-| Area | What you implemented |
-| --- | --- |
-| **Custom health check** | Created `ProductCatalogHealthCheck` to verify product catalog data in `productsapi` |
-| **Service registration** | Registered the custom check with ASP.NET Core health checks in `Program.cs` |
-| **AppHost integration** | Added `HealthChecksUI` as an Aspire resource and linked it to dependent services |
+| Area                         | What you implemented                                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Custom health check**      | Created `ProductCatalogHealthCheck` to verify product catalog data in `productsapi`                                       |
+| **Service registration**     | Registered the custom check with ASP.NET Core health checks in `Program.cs`                                               |
+| **AppHost integration**      | Added `HealthChecksUI` as an Aspire resource and linked it to dependent services                                          |
 | **Shared endpoint behavior** | Updated `CloudStore.ServiceDefaults` to support UI response output, timeout/cache policies, and host-restricted endpoints |
-| **Validation** | Verified health states, including dependency checks (Redis/SQL), in the HealthChecks UI dashboard |
+| **Validation**               | Verified health states, including dependency checks (Redis/SQL), in the HealthChecks UI dashboard                         |
 
 You now have a practical pattern for moving from basic endpoint liveness checks to richer, dependency-aware health reporting in Aspire.
 
