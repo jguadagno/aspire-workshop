@@ -56,7 +56,7 @@ From the `CloudStore.Api` project root:
 dotnet build
 
 # Run the API (applies migrations automatically on first run)
-dotnet run --project CloudStore.Api.csproj
+dotnet run --project CloudStore.Api/CloudStore.Api.csproj
 ```
 
 The API will be available at `http://localhost:5200`
@@ -131,6 +131,8 @@ The frontend will be available at `http://localhost:4200`
 
 ## Stopping Services
 
+Stop the website and API, then stop Docker containers:
+
 ```bash
 # Stop Docker containers
 docker-compose down
@@ -160,12 +162,9 @@ docker-compose down -v
 
 This application is the starting point for **Section 03 Labs**, where you'll:
 
-1. **Lab 1**: Create an Aspire AppHost to orchestrate these services
-2. **Lab 2**: Add the Angular frontend to AppHost
-3. **Lab 3**: Replace docker-compose PostgreSQL with Aspire-managed PostgreSQL
-4. **Lab 4**: Replace hardcoded Redis connection with Aspire-managed Redis
-5. **Lab 5**: Remove docker-compose entirely, add Aspire Azure Storage integration
-6. **Lab 6**: Create an Azure Function for thumbnail generation
-7. **Lab 7**: Add health checks, observability, and custom dashboard commands
+1. **Step 1**: Double check everything is working locally
+2. **Step 2**: Add Aspire to the project and wire up the infrastructure (PostgreSQL, Redis, Azure Storage, etc.)
+3. **Step 3**: Add the Frontend SPA, Api, and connect them together
+4. **Step 4**: Add the Aspire MCP agents to the project.
 
 Start with **Lab 1** at `../lab-01-add-apphost.md`
