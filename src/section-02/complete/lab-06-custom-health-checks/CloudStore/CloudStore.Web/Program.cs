@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Wire up Redis as the output cache backing store.
+// "cache" must match the name used in AddRedis("cache") in the AppHost
+builder.AddRedisOutputCache("cache");
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -18,7 +22,6 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     });
-
 // New client for the products API – Aspire resolves "productsapi" via service discovery
 builder.Services.AddHttpClient<ProductsApiClient>(client =>
 {

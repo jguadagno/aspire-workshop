@@ -1,4 +1,4 @@
-namespace CloudStore.Web;
+﻿namespace CloudStore.Web;
 
 public class ProductsApiClient(HttpClient httpClient)
 {
