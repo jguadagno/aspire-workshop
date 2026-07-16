@@ -255,9 +255,9 @@ dotnet build CloudStore.AppHost
 
 ## Step 4 – Configure Azure Deployment Settings
 
-Aspire needs three values to deploy to Azure.  If you don't set them, Aspire will prompt you for them on the first `aspire deploy`.
+Aspire needs three values to deploy to Azure. Currently, Aspire reads them from the environment. If you don't set them, Aspire will prompt you for them on the first `aspire deploy`.
 
-These settings need to be stored as environments variables.
+> **Note**: Optional for this lab, but recommended for CI/CD pipelines. You can also set these values in a `.env` file or via your CI/CD pipeline's secret management.
 
 | Setting                 | What it controls                                                               |
 | ----------------------- | ------------------------------------------------------------------------------ |
@@ -265,28 +265,20 @@ These settings need to be stored as environments variables.
 | `Azure__Location`       | The Azure region where resources are provisioned (e.g. `eastus`, `westeurope`) |
 | `Azure__ResourceGroup`  | The resource group to create (or reuse)                                        |
 
-Store these as Aspire secrets so they are used automatically on every `aspire deploy`. Run the following from the `CloudStore` folder (the folder containing `aspire.config.json`):
-
-```powershell
-aspire secret set "Azure__SubscriptionId" "<your-subscription-id>"
-aspire secret set "Azure__Location"       "centralus"
-aspire secret set "Azure__ResourceGroup"  "cloudstore-rg"
-```
-
 Replace `<your-subscription-id>` with the subscription ID shown by `az account show`. Replace `eastus` and `cloudstore-rg` with your preferred region and resource group name.
 
 > **Tip:** You can use any region that supports Azure Container Apps and Azure SQL Server. Run `az account list-locations -o table` to see available regions.
-> **Note:** If the resource group does not exist, Aspire creates it automatically. If it already exists and you want Aspire to reuse it without creating a new one, also set `Azure:AllowResourceGroupCreation` to `false`.
+> **Note:** If the resource group does not exist, Aspire creates it automatically. If it already exists and you want Aspire to reuse it without creating a new one, also set `Azure__AllowResourceGroupCreation` to `false`.
 
 ### Step 4 Checkpoint
 
 Verify the secrets were saved:
 
 ```powershell
-aspire secret list
+Get-ChildItem Env: | Where-Object { $_.Name -match "Azure__" }
 ```
 
-You should see `Azure:SubscriptionId`, `Azure:Location`, and `Azure:ResourceGroup` in the output.
+You should see `Azure__SubscriptionId`, `Azure__Location`, and `Azure__ResourceGroup` in the output.
 
 ---
 
@@ -522,14 +514,14 @@ Steps Summary:
 
 ## Troubleshooting
 
-| Problem | Likely cause | Fix |
-| --- | --- | --- |
-| `aspire deploy --list-steps` shows only 2 steps (`deploy-prereq`, `deploy`) | ACA environment not registered in AppHost | Ensure `builder.AddAzureContainerAppEnvironment("env")` exists and `Aspire.Hosting.Azure.AppContainers` is referenced. |
-| `validate-azure-login` fails | Azure CLI session expired or wrong tenant/subscription | Re-run `az login`, then verify `az account show` and set the intended subscription with `az account set`. |
-| Build or push image steps fail | Docker daemon not running or local disk full | Start Docker Desktop, free disk space, and rerun `aspire deploy`. |
-| SQL/Redis provisioning fails | Regional availability/quota or transient Azure provisioning error | Try another supported region and rerun `aspire deploy`; pipeline state allows resume behavior. |
-| Web frontend deploys, but no products appear | Database not seeded in production deployment path | This lab validates deployment connectivity; seed data separately if required for demo content. |
-| `aspire destroy` leaves resource group in deleting state | Azure asynchronous deletion still in progress | Wait and monitor in Azure Portal; deletion can take several minutes for ACA/SQL dependencies. |
+| Problem                                                                     | Likely cause                                                      | Fix                                                                                                                    |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `aspire deploy --list-steps` shows only 2 steps (`deploy-prereq`, `deploy`) | ACA environment not registered in AppHost                         | Ensure `builder.AddAzureContainerAppEnvironment("env")` exists and `Aspire.Hosting.Azure.AppContainers` is referenced. |
+| `validate-azure-login` fails                                                | Azure CLI session expired or wrong tenant/subscription            | Re-run `az login`, then verify `az account show` and set the intended subscription with `az account set`.              |
+| Build or push image steps fail                                              | Docker daemon not running or local disk full                      | Start Docker Desktop, free disk space, and rerun `aspire deploy`.                                                      |
+| SQL/Redis provisioning fails                                                | Regional availability/quota or transient Azure provisioning error | Try another supported region and rerun `aspire deploy`; pipeline state allows resume behavior.                         |
+| Web frontend deploys, but no products appear                                | Database not seeded in production deployment path                 | This lab validates deployment connectivity; seed data separately if required for demo content.                         |
+| `aspire destroy` leaves resource group in deleting state                    | Azure asynchronous deletion still in progress                     | Wait and monitor in Azure Portal; deletion can take several minutes for ACA/SQL dependencies.                          |
 
 ---
 
