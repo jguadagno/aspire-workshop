@@ -474,7 +474,9 @@ Open up the `CloudStore.Api\Program.cs` file and update the CORS policy to allow
 
 ```csharp
         var frontEndUri = Environment.GetEnvironmentVariable("Angular_FrontEnd") ?? "http://localhost:4200";
-        policy.WithOrigins(frontEndUri);
+        policy.WithOrigins(frontEndUri)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
 ```
 
 This will allow the Web frontend to access the API when running under Aspire, and it will also allow the Web frontend to access the API when running locally with `docker-compose` or in production.
