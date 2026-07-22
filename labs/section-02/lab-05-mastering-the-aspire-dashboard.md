@@ -276,7 +276,7 @@ Restart the application.
 
 Add a custom metric to count product catalog loads:
 
-Now in the `CloudStore.ProductsApi\Program.cs` file, add:
+Now in the `CloudStore.ProductsApi/Program.cs` file, add:
 
 ```csharp
 using System.Diagnostics.Metrics;
@@ -316,9 +316,9 @@ After restarting, view the `Products` page in the web app.
 
 ## Step 8 – Add Friendly URLs
 
-This step is optional, but it makes the dashboard easier to use by changing endpoint labels to friendly URLs. Copy the file `src/section-02/lab-05-files\UrlHelper.cs` into the `CloudStore.AppHost` project.
+This step is optional, but it makes the dashboard easier to use by changing endpoint labels to friendly URLs. Copy the file `src/section-02/lab-05-files/UrlHelper.cs` into the `CloudStore.AppHost` project.
 
-Then in the `CloudStore.AppHost\AppHost.cs` file, we can add a new method to generate friendly URLs for the dashboard:
+Then in the `CloudStore.AppHost/AppHost.cs` file, we can add a new method to generate friendly URLs for the dashboard:
 
 First the *apiservice* for the service URLs:
 

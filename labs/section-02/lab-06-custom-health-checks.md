@@ -70,7 +70,7 @@ public class ProductCatalogHealthCheck(AppDbContext appDbContext) : IHealthCheck
 
 This health check queries the `Products` table in our database and returns *Unhealthy* if there are no products, and *Healthy* if there is at least one product.
 
-Next, we need to register this health check in the DI container. Open `CloudStore.ProductsApi\Program.cs` and add the following line to the service configuration, after the `builder.AddServiceDefaults()` call:
+Next, we need to register this health check in the DI container. Open `CloudStore.ProductsApi/Program.cs` and add the following line to the service configuration, after the `builder.AddServiceDefaults()` call:
 
 ```csharp
 builder.Services.AddHealthChecks()
@@ -108,7 +108,7 @@ Add the following files from `src/section-02/lab-06-files` to the `CloudStore.Ap
 
 ### 2b – Add HealthChecksUI to the AppHost
 
-Add HealthChecksUI to the AppHost. Open `CloudStore.AppHost\Program.cs` and add the HealthChecksUI registration after the `webfrontend` registration:
+Add HealthChecksUI to the AppHost. Open `CloudStore.AppHost/Program.cs` and add the HealthChecksUI registration after the `webfrontend` registration:
 
 ```csharp
 var healthChecksUI = builder.AddHealthChecksUI("healthchecksui")
@@ -143,12 +143,12 @@ Stop the application.
 Add the package `AspNetCore.HealthChecks.UI.Client` to the `CloudStore.ServiceDefaults.csproj` file:
 
 ```bash
-dotnet add CloudStore.ServiceDefaults\CloudStore.ServiceDefaults.csproj package AspNetCore.HealthChecks.UI.Client
+dotnet add CloudStore.ServiceDefaults/CloudStore.ServiceDefaults.csproj package AspNetCore.HealthChecks.UI.Client
 ```
 
-The code changes to `CloudStore.ServiceDefaults\Extensions.cs` are shown below. If you prefer, you can copy the `Extensions.cs` file from `lab-06-files` to `CloudStore.ServiceDefaults`.
+The code changes to `CloudStore.ServiceDefaults/Extensions.cs` are shown below. If you prefer, you can copy the `Extensions.cs` file from `lab-06-files` to `CloudStore.ServiceDefaults`.
 
-Open `CloudStore.ServiceDefaults\Extensions.cs` and add the following using statement:
+Open `CloudStore.ServiceDefaults/Extensions.cs` and add the following using statement:
 
 ```csharp
 using Microsoft.Extensions.Configuration;

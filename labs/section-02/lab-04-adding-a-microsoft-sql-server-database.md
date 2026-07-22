@@ -230,7 +230,7 @@ We are going to use the first approach for this lab.
 
 Aspire manages the database container (including the connection string), and also provides a way to run database scripts to initialize the schema. This is done with the `WithCreationScript` method on the database resource in AppHost.
 
-Create a folder at the root of the solution called `scripts\database`. Inside that folder, create a new file called `create-database.sql` with the following content:
+Create a folder at the root of the solution called `scripts/database`. Inside that folder, create a new file called `create-database.sql` with the following content:
 
 > Note: Make sure to replace `<REPLACE_ME>` with a password that meets SQL Server's password requirements (at least 8 characters, including uppercase, lowercase, number, and symbol) before running the app or the database creation will fail since we set the password in the SQL script and it's required for the SQL Server container to start properly.
 > Note: These files can be copied from `src/section-02/lab-04-files/scripts` if you want to skip typing them out.

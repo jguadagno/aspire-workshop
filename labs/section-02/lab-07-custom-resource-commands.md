@@ -51,7 +51,7 @@ In the `CloudStore.AppHost` project, you can define custom commands that appear 
 
 Create a custom command to clear the Redis cache in the `cache` resource.
 
-In the `CloudStore.AppHost` project, create a new file named `RedisResourceBuilderExtensions.cs`, or copy the file from `.\lab-07-files\RedisResourceBuilderExtensions.cs`, with the following content:
+In the `CloudStore.AppHost` project, create a new file named `RedisResourceBuilderExtensions.cs`, or copy the file from `./lab-07-files/RedisResourceBuilderExtensions.cs`, with the following content:
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;

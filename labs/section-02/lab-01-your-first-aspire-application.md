@@ -167,11 +167,11 @@ dotnet run --project CloudStore/CloudStore.AppHost
 Watch the terminal output. You will see something like:
 
 ```text
-AppHost:  CloudStore.AppHost\CloudStore.AppHost.csproj                       
+AppHost:  CloudStore.AppHost/CloudStore.AppHost.csproj                       
                                                                                  
 Dashboard:  https://localhost:17039/login?t=<token>   
                                                                                   
-Logs:  C:\Users\<localuser>\.aspire\logs\cli_20260606T210544_4c316f10.log     
+Logs:  C:/Users/<localuser>/.aspire/logs/cli_20260606T210544_4c316f10.log     
 ```
 
 ## Step 5 – Open the Aspire Dashboard

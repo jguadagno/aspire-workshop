@@ -114,7 +114,7 @@ Stop anything that may still be running from `docker-compose.yml`:
 
 ```powershell
 docker compose down
-docker ps --format "table {{.Names}}\t{{.Ports}}"
+docker ps --format "table {{.Names}}/t{{.Ports}}"
 ```
 
 #### Docker Checkpoint
@@ -130,7 +130,7 @@ docker ps --format "table {{.Names}}\t{{.Ports}}"
 ### 1.3 Restore solution dependencies before Aspire wiring
 
 ```powershell
-dotnet restore .\CloudStore.slnx
+dotnet restore ./CloudStore.slnx
 ```
 
 #### Package Restore Checkpoint
@@ -153,12 +153,12 @@ aspire init
 Add the AppHost project to the solution:
 
 ```powershell
-dotnet sln add .\CloudStore.AppHost\CloudStore.AppHost.csproj
+dotnet sln add ./CloudStore.AppHost/CloudStore.AppHost.csproj
 ```
 
 #### Checkpoint
 
-- A new AppHost project is created (for example, `AppHost\AppHost.csproj`).
+- A new AppHost project is created (for example, `AppHost/AppHost.csproj`).
 - `CloudStore.slnx` now includes the AppHost project.
 
 #### Aspire Checkpoint
@@ -186,9 +186,9 @@ aspire add azure-storage
 - AppHost package references include hosting integrations for PostgreSQL, Redis, and Azure Storage.
 - AppHost code can use resource methods for these services.
 
-### 2.3 Model resources in `AppHost\Program.cs`
+### 2.3 Model resources in `AppHost/Program.cs`
 
-Update `CloudStore.AppHost\AppHost.cs` to include resource declarations so Aspire orchestrates all dependencies currently represented in `docker-compose.yml`.
+Update `CloudStore.AppHost/AppHost.cs` to include resource declarations so Aspire orchestrates all dependencies currently represented in `docker-compose.yml`.
 
 We'll see later that the names used here will matter for configuration injection into the API and Web projects. It's important to keep the names consistent with what the API expects.
 
@@ -230,7 +230,7 @@ After startup, open the Aspire dashboard URL printed in the terminal. It will lo
 
    Dashboard:  https://localhost:17298/login?t=d637c204d129963ad661156a4f606a69
 
-        Logs:  <user_home>\.aspire\logs\cli_20260630T162934383_detach-child_8fd6b9664afa4cad9f98ccdeedc85725.log
+        Logs:  <user_home>/.aspire/logs/cli_20260630T162934383_detach-child_8fd6b9664afa4cad9f98ccdeedc85725.log
 
          PID:  36640
 
@@ -257,7 +257,7 @@ Click the dashboard link and verify that the resources are running and healthy:
 
 - If a resource is unhealthy, open its logs in the dashboard and verify Docker Desktop is running.
 - If startup fails with port conflict, stop conflicting containers/processes and rerun `aspire start`.
-- If package restore fails during startup, run `dotnet restore .\CloudStore.slnx` and retry.
+- If package restore fails during startup, run `dotnet restore ./CloudStore.slnx` and retry.
 
 ## Step 3 – Wire `CloudStore.Api` and `CloudStore.Web` into AppHost and map configuration
 
@@ -283,7 +283,7 @@ Since the web project is an Angular/Vite app, it does not need a project referen
 dotnet add CloudStore.AppHost.csproj package Aspire.Hosting.JavaScript
 ```
 
-Now we can add the API and Web resources in `CloudStore.AppHost\AppHost.cs`. Add the following code after the resource declarations for PostgreSQL, Redis, and Azure Storage:
+Now we can add the API and Web resources in `CloudStore.AppHost/AppHost.cs`. Add the following code after the resource declarations for PostgreSQL, Redis, and Azure Storage:
 
 ```csharp
 var api = builder.AddProject<Projects.CloudStore_Api>("api")
@@ -309,13 +309,13 @@ var web = builder.AddViteApp("web", "../CloudStore.Web", "start")
 
 ### 3.2 Map API configuration expectations to Aspire resource injection
 
-Current API behavior (`CloudStore.Api\Program.cs`) expects these connection strings:
+Current API behavior (`CloudStore.Api/Program.cs`) expects these connection strings:
 
 - `ConnectionStrings:PostgreSQL`
 - `ConnectionStrings:Redis`
 - `ConnectionStrings:AzureStorage`
 
-You can keep the `CloudStore.Api\appsettings.json` as local fallback, but I recommend that you delete it temporarily or rename the settings to make sure your connections are correctly being loaded from Aspire.
+You can keep the `CloudStore.Api/appsettings.json` as local fallback, but I recommend that you delete it temporarily or rename the settings to make sure your connections are correctly being loaded from Aspire.
 
 Aspire will inject the connection strings at runtime. The configuration keys will match the resource names you used in `AppHost.cs`.
 
@@ -329,10 +329,10 @@ will inject the PostgreSQL connection string as `ConnectionStrings:PostgreSQL`. 
 
 This means, in our current application, we need to tweak a few things to make sure the API reads the connection strings from the environment instead of hardcoding them in `appsettings.json`.
 
-1) You need to make sure the connection strings in *CloudStore.Api\appsettings.json* are removed or commented out, so that the API does not use them. Aspire will inject the connection strings at runtime.
-2) You need to make sure the connection strings names in *CloudStore.Api\Program.cs* match the resource names you used in *AppHost.cs*. For example, if you used `redis` as the name of the redis resource in `AppHost.cs`, then the connection string key in `Program.cs` should be `ConnectionStrings:redis`.
+1) You need to make sure the connection strings in *CloudStore.Api/appsettings.json* are removed or commented out, so that the API does not use them. Aspire will inject the connection strings at runtime.
+2) You need to make sure the connection strings names in *CloudStore.Api/Program.cs* match the resource names you used in *AppHost.cs*. For example, if you used `redis` as the name of the redis resource in `AppHost.cs`, then the connection string key in `Program.cs` should be `ConnectionStrings:redis`.
 
-Double-check the connection string names in `CloudStore.Api\Program.cs`:
+Double-check the connection string names in `CloudStore.Api/Program.cs`:
 
 #### PostgreSQL Configuration
 
@@ -344,7 +344,7 @@ However, if you want to use the power of Aspire and add additional health checks
 dotnet add ../CloudStore.Api/CloudStore.Api.csproj package Aspire.Azure.Npgsql.EntityFrameworkCore.PostgreSQL
 ```
 
-Then, in the `CloudStore.Api\Program.cs`, you can register the DbContext with the dependency injection system using the `AddPostgresDbContext` method. Locate the `// Database` comment in the `CloudStore.Api\Program.cs` file and replace the four lines after it, with the following code:
+Then, in the `CloudStore.Api/Program.cs`, you can register the DbContext with the dependency injection system using the `AddPostgresDbContext` method. Locate the `// Database` comment in the `CloudStore.Api/Program.cs` file and replace the four lines after it, with the following code:
 
 ```csharp
 builder.AddAzureNpgsqlDbContext<CloudStoreDbContext>(connectionName: "PostgreSQL");
@@ -372,9 +372,9 @@ dotnet add ../CloudStore.Api/CloudStore.Api.csproj package Aspire.Azure.Storage.
 dotnet add ../CloudStore.Api/CloudStore.Api.csproj package Aspire.Azure.Data.Tables
 ```
 
-Now in the `CloudStore.Api\Program.cs`, you can register the Blob and Table clients with the dependency injection system using the `AddAzureBlobClient` and `AddAzureTableClient` methods, respectively.
+Now in the `CloudStore.Api/Program.cs`, you can register the Blob and Table clients with the dependency injection system using the `AddAzureBlobClient` and `AddAzureTableClient` methods, respectively.
 
-Locate the `// Azure Storage (Azurite emulator)` comment in the `CloudStore.Api\Program.cs` file, then replace all of the code up to the `// Services` comment with the following code:
+Locate the `// Azure Storage (Azurite emulator)` comment in the `CloudStore.Api/Program.cs` file, then replace all of the code up to the `// Services` comment with the following code:
 
 ```csharp
 builder.AddAzureBlobServiceClient("blobs");
@@ -385,7 +385,7 @@ builder.AddAzureTableServiceClient("tables");
 
 Now, the API will pick up the connection strings for Blob and Table storage from Aspire at runtime, and you do not need to hardcode them in `Program.cs`. However, you still need to update the `StorageService` to use the `BlobServiceClient` and `TableServiceClient` that are registered with the dependency injection system.
 
-Open up the `CloudStore.Infrastructure\Services\StorageService.cs` file and update the constructor to accept `BlobServiceClient` and `TableServiceClient` as parameters. Then, use these clients to perform Blob and Table operations.
+Open up the `CloudStore.Infrastructure/Services/StorageService.cs` file and update the constructor to accept `BlobServiceClient` and `TableServiceClient` as parameters. Then, use these clients to perform Blob and Table operations.
 
 ```csharp
 public class StorageService(BlobServiceClient blobServiceClient, TableServiceClient tableServiceClient, IImageService imageService) : IStorageService
@@ -424,7 +424,7 @@ The Angular frontend currently hardcodes the API URL to `https://localhost:7200/
 
 First, we must get the API base URL from the AppHost runtime configuration.
 
-Edit the `CloudStore.AppHost\AppHost.cs` file to add a runtime configuration for the API base URL. Add the following code for `web` resource after the `.WithReference(api)` and before the `.WaitFor(api)`.
+Edit the `CloudStore.AppHost/AppHost.cs` file to add a runtime configuration for the API base URL. Add the following code for `web` resource after the `.WithReference(api)` and before the `.WaitFor(api)`.
 
 ```csharp
     .WithEnvironment("VITE_API_BASE_URL", api.GetEndpoint("http"))
@@ -434,7 +434,7 @@ This will inject the API base URL into the Web frontend as an environment variab
 
 Now replace the API URL from the AppHost runtime config.
 
-`CloudStore.Web\src\app\services\product.service.ts` currently hardcodes:
+`CloudStore.Web/src/app/services/product.service.ts` currently hardcodes:
 
 ```typescript
 private apiUrl = 'https://localhost:7200/api/products';
@@ -460,9 +460,9 @@ interface ImportMeta {
 
 Once you do this, the Web frontend will use the API base URL provided by Aspire at runtime, and it will work regardless of the port or host that the API is running on.
 
-However, the frontend will still not work since we have a CORS policy that only allows `https://localhost:4200` to access the API. We need to update the CORS policy in `CloudStore.Api\Program.cs` to allow the Web frontend to access the API when running under Aspire. But first, we need to get the Web frontend URL from the AppHost runtime configuration.
+However, the frontend will still not work since we have a CORS policy that only allows `https://localhost:4200` to access the API. We need to update the CORS policy in `CloudStore.Api/Program.cs` to allow the Web frontend to access the API when running under Aspire. But first, we need to get the Web frontend URL from the AppHost runtime configuration.
 
-Open up the `CloudStore.AppHost\AppHost.cs` file and add a runtime configuration for the Web frontend URL. Add the following code for `api` resource after the declaration of the `web` variable.
+Open up the `CloudStore.AppHost/AppHost.cs` file and add a runtime configuration for the Web frontend URL. Add the following code for `api` resource after the declaration of the `web` variable.
 
 ```csharp
 api.WithEnvironment("Angular_FrontEnd", web.GetEndpoint("http"));
@@ -470,7 +470,7 @@ api.WithEnvironment("Angular_FrontEnd", web.GetEndpoint("http"));
 
 The name, `Angular_FrontEnd`, is arbitrary, but it you need to remember it because we are going to use it in the *Api* project to get the web frontend URL at runtime.
 
-Open up the `CloudStore.Api\Program.cs` file and update the CORS policy to allow the Web frontend to access the API when running under Aspire. Replace the hardcoded `https://localhost:4200` with the runtime configuration value for the Web frontend URL. change the `policy.WithOrigins` line to the following:
+Open up the `CloudStore.Api/Program.cs` file and update the CORS policy to allow the Web frontend to access the API when running under Aspire. Replace the hardcoded `https://localhost:4200` with the runtime configuration value for the Web frontend URL. change the `policy.WithOrigins` line to the following:
 
 ```csharp
         var frontEndUri = Environment.GetEnvironmentVariable("Angular_FrontEnd") ?? "http://localhost:4200";
@@ -521,7 +521,7 @@ In a Terminal, run the following command from the repo root:
 ```powershell
 cd .. # repository root
 dotnet new aspire-servicedefaults -n CloudStore.ServiceDefaults
-dotnet sln add .\CloudStore.ServiceDefaults\CloudStore.ServiceDefaults.csproj
+dotnet sln add ./CloudStore.ServiceDefaults/CloudStore.ServiceDefaults.csproj
 ```
 
 Add a reference to the `CloudStore.ServiceDefaults` project in the `CloudStore.Api` project:
@@ -530,13 +530,13 @@ Add a reference to the `CloudStore.ServiceDefaults` project in the `CloudStore.A
 dotnet add CloudStore.Api/CloudStore.Api.csproj reference CloudStore.ServiceDefaults/CloudStore.ServiceDefaults.csproj
 ```
 
-Next in the `CloudStore.Api\Program.cs` file, add the call to the `AddServiceDefaults` method after the `builder` variable is created:
+Next in the `CloudStore.Api/Program.cs` file, add the call to the `AddServiceDefaults` method after the `builder` variable is created:
 
 ```csharp
 builder.AddServiceDefaults();
 ```
 
-Now we need to map the endpoints for the health checks. Further down in the `CloudStore.Api\Program.cs` file, add the following code after the `var app = builder.Build();` line:
+Now we need to map the endpoints for the health checks. Further down in the `CloudStore.Api/Program.cs` file, add the following code after the `var app = builder.Build();` line:
 
 ```csharp
 app.MapDefaultEndpoints();
@@ -563,7 +563,7 @@ aspire stop
 aspire agent init
 ```
 
-When prompted for the path to the root of your workspace, provide the path of the repository root (for example, `D:\Projects\aspire-workshop\section-03\lab-01`).  If you run this command from the repository root, you can just press Enter to accept the default path.
+When prompted for the path to the root of your workspace, provide the path of the repository root (for example, `D:/Projects/aspire-workshop/section-03/lab-01`).  If you run this command from the repository root, you can just press Enter to accept the default path.
 
 Depending on the environment you are running this command from, you may be prompted to select the AI agent environment. If you are prompted, select the default option.
 
@@ -598,7 +598,7 @@ With AppHost running, wait for all of the resources to be healthy, then use the 
 
 ```text
 list_apphosts
-select_apphost(appHostPath: "D:\\Projects\\aspire-workshop\\section-03\\lab-01\\CloudStore.AppHost")
+select_apphost(appHostPath: "D://Projects//aspire-workshop//section-03//lab-01//CloudStore.AppHost")
 ```
 
 For a list of all of the MCP commands, view the [Aspire MCP Server documentation](https://aspire.dev/get-started/aspire-mcp-server/).
@@ -698,8 +698,8 @@ from `docker-compose.yml` into Aspire resource orchestration so app processes an
 If you get the message: `❌ Unable to stop one or more running Aspire AppHost instances. Please stop the application and try again.`, you can run the following commands to clean up any Aspire artifacts:
 
 ```bash
-Remove-Item "$env:USERPROFILE\.aspire\cli\bch\*" -Force -ErrorAction SilentlyContinue
-Remove-Item "$env:USERPROFILE\.aspire\cli\backchannels\*" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:USERPROFILE/.aspire/cli/bch/*" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:USERPROFILE/.aspire/cli/backchannels/*" -Force -ErrorAction SilentlyContinue
 ```
 
 ---
