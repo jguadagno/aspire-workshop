@@ -52,7 +52,7 @@ Switching to `AddAzureRedis` and `AddAzureSqlServer` means your local experience
 
 ## Getting Started
 
-You can begin this lab with the starter application at `section-04\start-here`. If you want to preserve the original, copy it to a new folder (e.g. `section-04\lab-01`) before making changes.
+You can begin this lab with the starter application at `section-04/start-here`. If you want to preserve the original, copy it to a new folder (e.g. `section-04/lab-01`) before making changes.
 
 All commands are run from inside the `CloudStore` folder (the folder that contains `CloudStore.sln`) unless a step states otherwise.
 
@@ -401,8 +401,8 @@ Helpful Paths
 
 | Path | Description |
 | ---- | ----------- |
-| `$env:USERPROFILE\.aspire\deployments` | Contains the deployment state cache. Aspire uses this to skip unchanged steps on subsequent deployments. |
-| `$env:USERPROFILE\.aspire\logs` | Contains the Aspire logs. |
+| `$env:USERPROFILE/.aspire/deployments` | Contains the deployment state cache. Aspire uses this to skip unchanged steps on subsequent deployments. |
+| `$env:USERPROFILE/.aspire/logs` | Contains the Aspire logs. |
 
 ---
 
