@@ -344,7 +344,7 @@ However, if you want to use the power of Aspire and add additional health checks
 dotnet add ../CloudStore.Api/CloudStore.Api.csproj package Aspire.Azure.Npgsql.EntityFrameworkCore.PostgreSQL
 ```
 
-Then, in the `CloudStore.Api\Program.cs`, you can register the DbContext with the dependency injection system using the `AddPostgresDbContext` method. Locate the `// Database` comment in the `CloudStore.Api\Program.cs` file and four lines after it, add the following code:
+Then, in the `CloudStore.Api\Program.cs`, you can register the DbContext with the dependency injection system using the `AddPostgresDbContext` method. Locate the `// Database` comment in the `CloudStore.Api\Program.cs` file and replace the four lines after it, with the following code:
 
 ```csharp
 builder.AddAzureNpgsqlDbContext<CloudStoreDbContext>(connectionName: "PostgreSQL");
